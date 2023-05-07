@@ -1,8 +1,8 @@
 import java.io.Serializable;
 
 public class AuthorizationPackage extends Package implements Serializable {
-    private String login;
-    private String password;
+    private final String login;
+    private final String password;
 
     AuthorizationPackage(String login, String password) {
         super(PackageType.AUTHORIZATION);

@@ -1,6 +1,6 @@
 public class Test {
     public static void main(String[] args) {
-        String s = "Hello suka nahui!";
+        String s = "Тестовое сообщение!";
 
         try {
             AES aes = new AES();

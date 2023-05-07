@@ -1,13 +1,10 @@
-/*
- * Шифрование пакетов
- *
- * Пока что не работает и лежит мертвым грузом
- * */
-
 import javax.crypto.*;
 import java.io.*;
 import java.security.*;
 
+/**
+ * Шифровальщик пакетов.
+ */
 public class Encryption {
     private PublicKey publicKey;
     private PrivateKey privateKey;

@@ -1,12 +1,10 @@
-/*
- * Сетевой пакет, который содержит всю необходимю информацию для передачи
- * по сети
- * */
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Сетевой пакет, который содержит всю необходимю информацию для передачи по сети.
+ */
 public class Package implements Serializable {
     protected PackageType type;
     protected String sendingTime;
@@ -23,8 +21,7 @@ public class Package implements Serializable {
     protected String generateTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         Date date = new Date(System.currentTimeMillis());
-        String format_date = formatter.format(date); // Уже отформатированное время и дата
-        return format_date;
+        return formatter.format(date);
     }
 
     @Override

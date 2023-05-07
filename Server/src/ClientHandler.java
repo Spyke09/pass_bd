@@ -8,23 +8,22 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ClientHandler implements Runnable {
-    private Encryption enc;
+    private final Encryption enc;
 
     private PublicKey userPublicKey;
-    private final PublicKey selfPublickKey;
+    private final PublicKey selfPublicKey;
     private final PrivateKey selfPrivateKey;
 
     private ObjectOutputStream objectWriter;
     private ObjectInputStream objectReader;
 
-    private DataBaseHandler dbHandler;
-    private PasswordDBHandler passwordsDB;
+    private final DataBaseHandler dbHandler;
 
     private String login;
 
     private boolean isAuthorized;
 
-    public ClientHandler(Socket socket, Server server) {
+    public ClientHandler(Socket socket) {
         System.out.println("Client has been connected!");
 
         isAuthorized = false;
@@ -33,7 +32,7 @@ public class ClientHandler implements Runnable {
 
         enc = new Encryption();
 
-        this.selfPublickKey = enc.getPublicKey();
+        this.selfPublicKey = enc.getPublicKey();
         this.selfPrivateKey = enc.getPrivateKey();
 
         try {
@@ -50,19 +49,17 @@ public class ClientHandler implements Runnable {
         controller();
     }
 
+    /**
+     * Обмен ключами с клиентом.
+     * Сначала принимает сервер клиентский ключ, затем отправляет клиенту свой
+     */
     private void exchangeKeys() {
-        /*
-         * Обмен ключами с клиентом
-         *
-         * Сначала принимает сервер клиентский ключ,
-         * затем отправляет клиенту свой
-         * */
+
 
         try {
             userPublicKey = (PublicKey) objectReader.readObject();
-//            System.out.println("Client public key: " + userPublicKey);
 
-            objectWriter.writeObject(selfPublickKey);
+            objectWriter.writeObject(selfPublicKey);
             objectWriter.flush();
 
         } catch (Exception e) {
@@ -70,13 +67,13 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Обрабатывает принимаемые пакеты
+     */
     private void controller() {
-        /*
-         * Обрабатывает принимаемые пакеты
-         * */
-
-        while (true) {
-            Package pack = recievePackage();
+        boolean stop_q = false;
+        while (!stop_q) {
+            Package pack = receivePackage();
             PackageType type = pack.getType();
 
             switch (type) {
@@ -89,7 +86,7 @@ public class ClientHandler implements Runnable {
                 case AUTHORIZATION:
                     AuthorizationPackage autPack = (AuthorizationPackage) pack;
                     System.out.println(pack);
-                    autorization(autPack);
+                    authorization(autPack);
                     break;
 
                 case ADD_AUTHORIZE_DATA:
@@ -97,7 +94,7 @@ public class ClientHandler implements Runnable {
                         DataPackage aadp = (DataPackage) pack;
                         System.out.println(aadp);
 
-                        addAutorizationData(
+                        addAuthorizationData(
                                 aadp.getUrl(),
                                 aadp.getLogin(),
                                 aadp.getPassword()
@@ -125,10 +122,10 @@ public class ClientHandler implements Runnable {
 
                 case GET_AUTHORIZE_DATA:
                     if (isAuthorized) {
-                        DataPackage dadp = (DataPackage) pack;
-                        System.out.println(dadp);
+                        DataPackage data_p = (DataPackage) pack;
+                        System.out.println(data_p);
 
-                        sendAuthorizeData(dadp.getUrl());
+                        sendAuthorizeData(data_p.getUrl());
                     }
                     break;
 
@@ -142,23 +139,24 @@ public class ClientHandler implements Runnable {
                         Thread.sleep(300);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                        stop_q = true;
                     }
             }
         }
     }
 
-    private Package recievePackage() {
-        /*
-         * Принимает и расшифровывает пакет
-         * */
+    /**
+     * Принимает и расшифровывает пакет
+     */
+    private Package receivePackage() {
+
 
         try {
             SendingPackage p = (SendingPackage) objectReader.readObject();
-            Package pac = enc.decrypt(p.getData(), selfPrivateKey);
 
-            return pac;
+            return enc.decrypt(p.getData(), selfPrivateKey);
 
-        } catch (SocketException | EOFException e) {
+        } catch (SocketException | EOFException ignored) {
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -166,11 +164,10 @@ public class ClientHandler implements Runnable {
     }
 
 
+    /**
+     * Шифрует пакет и потправляет пользователю
+     */
     private void sendPackage(Package pac) {
-        /*
-         * Шифрует пакет и потправляет пользователю
-         * */
-
         try {
             byte[] sendPack = enc.encrypt(pac, userPublicKey);
             SendingPackage p = new SendingPackage(sendPack);
@@ -185,22 +182,19 @@ public class ClientHandler implements Runnable {
     }
 
 
+    /**
+     * Регистрирует пользователя.
+     * Записывает логин и хеш пароля в базу со всеми пользователями.
+     */
     private void registration(RegistrationPackage rgp) {
-        /*
-         * Регистрирует пользователя
-         *
-         * По сути просто записывает логин и хеш пароля
-         * в базу со всеми пользователями
-         * */
-
         try {
             dbHandler.addUser(
-                    rgp.getLoggin(),
+                    rgp.getLogin(),
                     enc.makeHash(rgp.getPassword()),
                     rgp.getPhoneNumber(),
                     rgp.getEmail()
             );
-            this.login = rgp.getLoggin();
+            this.login = rgp.getLogin();
 
             sendPackage(new PackageAccept());
             isAuthorized = true;
@@ -212,14 +206,11 @@ public class ClientHandler implements Runnable {
     }
 
 
-    private void autorization(AuthorizationPackage pack) {
-        /*
-         * Проверяет наличие пользователя в базе
-         *
-         * Если пользователь есть, то сравнивает хеши паролей
-         * и принимает решение давать доступ или нет
-         * */
-
+    /**
+     * Проверяет наличие пользователя в базе.
+     * Если пользователь есть, то сравнивает хеши паролей и принимает решение давать доступ или нет.
+     */
+    private void authorization(AuthorizationPackage pack) {
         try {
             String hashedPassword = enc.makeHash(pack.getPassword());
 
@@ -237,11 +228,10 @@ public class ClientHandler implements Runnable {
     }
 
 
-    private void addAutorizationData(String url, String login, String password) {
-        /*
-         * Добавдение записи в базу данных с паролями пользователя
-         * */
-
+    /**
+     * Добавление записи в базу данных с паролями пользователя
+     */
+    private void addAuthorizationData(String url, String login, String password) {
         PasswordDBHandler dbHand = new PasswordDBHandler(this.login);
 
         try {
@@ -259,11 +249,10 @@ public class ClientHandler implements Runnable {
     }
 
 
+    /**
+     * Удаление записи из базы данных с паролями пользователя
+     */
     private void delAuthorizeData(String url) {
-        /*
-         * Удаление записи из базы данных с паролями пользователя
-         * */
-
         PasswordDBHandler dbHand = new PasswordDBHandler(this.login);
 
         try {
@@ -276,6 +265,10 @@ public class ClientHandler implements Runnable {
     }
 
 
+    /**
+     * Обновить пароль по url на новый password
+     * @param password - новый пароль
+     */
     private void updatePassword(String url, String password) {
         PasswordDBHandler dbHand = new PasswordDBHandler(this.login);
 
@@ -288,6 +281,9 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Послать данные авторизации.
+     */
     private void sendAuthorizeData(String url) {
         PasswordDBHandler dbHand = new PasswordDBHandler(this.login);
 
@@ -300,11 +296,10 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Отправляет всю базу данных пользователю
+     */
     private void sendAllDataBase() {
-        /*
-         * Отпроавляет всю базу данных пользователю
-         * */
-
         PasswordDBHandler dbHand = new PasswordDBHandler(this.login);
 
         try {

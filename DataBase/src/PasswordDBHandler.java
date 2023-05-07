@@ -1,14 +1,11 @@
-/*
- * Отвечает за взимодействие с базой данных
- * конкретного пользователя
- * */
-
-
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * Обработчик баз данных, отвечающих за хранения паролей пользователей на разных сайтах.
+ */
 public class PasswordDBHandler {
     private Connection connection;
 
@@ -19,12 +16,14 @@ public class PasswordDBHandler {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + path);
 
-            String request = " CREATE TABLE IF NOT EXISTS data (\n " +
-                    " url TEXT NOT NULL,\n" +
-                    " login TEXT NOT NULL,\n" +
-                    " password TEXT NOT NULL,\n" +
-                    " last_update_time TEXT NOT NULL\n" +
-                    ");";
+            // Запрос, создающий таблицу data с полями [url, login, password, last_update_time]
+            String request = """
+                     CREATE TABLE IF NOT EXISTS data (
+                      url TEXT NOT NULL,
+                     login TEXT NOT NULL,
+                     password TEXT NOT NULL,
+                     last_update_time TEXT NOT NULL
+                    );""";
 
 
             Statement statement = connection.createStatement();
@@ -35,11 +34,10 @@ public class PasswordDBHandler {
         }
     }
 
+    /**
+     * Добавление записи в базу данных с паролями пользователя.
+     */
     public void addRow(String url, String login, String password) throws SQLException {
-        /*
-         * Добавдение записи в базу данных с паролями пользователя
-         * */
-
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         java.util.Date date = new Date(System.currentTimeMillis());
         String format_date = formatter.format(date); // Уже отформатированное время и дата
@@ -51,11 +49,10 @@ public class PasswordDBHandler {
         statement.executeUpdate(responce);
     }
 
+    /**
+     * Удаление записи из базы данных с паролями пользователя.
+     */
     public void deleteRow(String url) throws SQLException {
-        /*
-         * Удаление записи из базы данных с паролями пользователя
-         * */
-
         String request = "DELETE FROM data WHERE url = ?;";
 
         PreparedStatement statement = connection.prepareStatement(request);
@@ -63,6 +60,10 @@ public class PasswordDBHandler {
         statement.executeUpdate();
     }
 
+    /**
+     * Обновление пароля для данного url.
+     * @param password - новый пароль.
+     */
     public void updatePassword(String url, String password) throws SQLException {
         String request = "UPDATE data SET password = '" + password + "' WHERE url = ?;";
 
@@ -71,29 +72,31 @@ public class PasswordDBHandler {
         statement.executeUpdate();
     }
 
+    /**
+     * Выдает список (url, login, password) пользователя по данному url.
+     */
     public ArrayList<String> getAuthorizeData(String url) throws SQLException {
         String request = "SELECT * FROM data WHERE url = '" + url + "';";
-
-//        PreparedStatement statement = connection.prepareStatement(request);
-//        statement.setString(1, url);
 
         Statement statement = connection.createStatement();
         ResultSet result = statement.executeQuery(request);
 
         ArrayList<String> data = new ArrayList<>();
+        while(result.next()){
+            String url_ = result.getString(1);
+            String login_ = result.getString(2);
+            String password_ = result.getString(3);
+            data.add("(" + url_ + ", " + login_ + ", " + password_ + ")");
+        }
 
-        data.add(result.getString(1));
-        data.add(result.getString(2));
-        data.add(result.getString(3));
 
         return data;
     }
 
+    /**
+     * Считывает и возвращает всю базу данных пользователя.
+     */
     public ArrayList<String> getFullDataBase() throws SQLException {
-        /*
-         * Считывает всю базу данных пользователя
-         * */
-
         String request = "SELECT * FROM data";
 
         Statement statement = connection.createStatement();
@@ -102,7 +105,9 @@ public class PasswordDBHandler {
         ArrayList<String> urls = new ArrayList<>();
 
         while (result.next()) {
-            urls.add(new String(result.getString(1) + "\t(Последнее обновление: " + result.getString(4) + ")"));
+            String url_ = result.getString(1);
+            String last_update_ = result.getString(4);
+            urls.add(url_ + "\t(Последнее обновление: " + last_update_ + ")");
         }
 
         return urls;

@@ -1,4 +1,6 @@
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.PrivateKey;
@@ -12,8 +14,8 @@ public class Client {
     Encryption enc;
 
     private PublicKey serverPublicKey;
-    private PublicKey selfPublicKey;
-    private PrivateKey selfPrivateKey;
+    private final PublicKey selfPublicKey;
+    private final PrivateKey selfPrivateKey;
 
     private Socket socket;
     private ObjectOutputStream writer;
@@ -38,55 +40,43 @@ public class Client {
             this.writer = new ObjectOutputStream(socket.getOutputStream());
 
         } catch (UnknownHostException e) {
-            System.err.println("Server is not avaliable");
+            System.err.println("Сервер недоступен.");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
 
-    public void run() {
-        /*
-         * Стартовая точка работы клиента
-         * */
-
+    /**
+     * Стартовая точка работы клиента.
+     */
+    public void run() throws Exception {
         // Обмен публичными ключами с сервером
         try {
             exchangeKeys();
         } catch (Exception e) {
-            System.err.println("Cannot echange public keys");
+            System.err.println("Не удается обменяться открытыми ключами.");
             e.printStackTrace();
         }
-
         // Авторизация на сервере
         authorize();
     }
 
+    /**
+     * Проверяет ответ от сервера.
+     */
     private boolean checkResponse() {
-        /*
-         * Проверяет ответ от сервера
-         * ( либо все збс, либо хуева )
-         * */
-
-        PackageType responseType = recievePackage().getType();
-
-        if (responseType.equals(PackageType.SERVICE_ACCEPT)) {
-            return true;
-        } else {
-            return false;
-        }
+        PackageType responseType = receivePackage().getType();
+        return responseType.equals(PackageType.SERVICE_ACCEPT);
     }
 
-    private Package recievePackage() {
-        /*
-         * Принимает и расшифровывает пакет
-         * */
-
+    /**
+     * Принимает и расшифровывает пакет.
+     */
+    private Package receivePackage() {
         try {
             SendingPackage p = (SendingPackage) reader.readObject();
-            Package pac = enc.decrypt(p.getData(), selfPrivateKey);
-
-            return pac;
+            return enc.decrypt(p.getData(), selfPrivateKey);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,11 +84,10 @@ public class Client {
         return new Package(PackageType.SERVICE_ERROR);
     }
 
+    /**
+     * Шифрует пакет и отправляет серверу.
+     */
     private void sendPackage(Package pac) throws Exception {
-        /*
-         * Шифрует пакет и потправляет серверу
-         * */
-
         byte[] sendingPackage = enc.encrypt(pac, serverPublicKey);
 
         SendingPackage p = new SendingPackage(sendingPackage);
@@ -106,29 +95,21 @@ public class Client {
         writer.flush();
     }
 
+    /**
+     * Обмен ключами с сервером
+     * Сначала клиент отправляет свой ключ, затем принимает ключ сервера
+     */
     private void exchangeKeys() throws IOException, ClassNotFoundException {
-        /*
-         * Обмен ключами с сервером
-         *
-         * Сначала клиент отправляет свой ключ,
-         * затем принимает ключ сервера
-         * */
-
         writer.writeObject(selfPublicKey);
         writer.flush();
 
         serverPublicKey = (PublicKey) reader.readObject();
-//        System.out.println("Client public key: " + serverPublicKey);
     }
 
-    private void authorize() {
-        /*
-         * Авторизация в приложении
-         *
-         * Либо регистрация
-         * Либо вход в уже сущесвтующий аккаунт
-         * */
-
+    /**
+     * Авторизация в приложении, либо регистрация, либо вход в уже существующий аккаунт.
+     */
+    private void authorize() throws Exception {
         int choice;
 
         System.out.println("ВЫберите действие: ");
@@ -157,13 +138,11 @@ public class Client {
         }
     }
 
+    /**
+     * Также запускает mainLoop()
+     * Регистрация нового аккаунта.
+     */
     private void registration() throws Exception {
-        /*
-         * Регистрация нового аккаунта
-         *
-         * Так же запускает главный цикл приложения
-         * */
-
         String login;
         String password;
         String phoneNumber;
@@ -198,13 +177,11 @@ public class Client {
         }
     }
 
-    private void authorization() {
-        /*
-         * Авторизация уже существующего аккаунта
-         *
-         * Так же запускает главыный цикл приложения
-         * */
-
+    /**
+     * Авторизация уже существующего аккаунта
+     * Также запускает mainLoop()
+     */
+    private void authorization() throws Exception {
         String login;
         String password;
 
@@ -231,7 +208,7 @@ public class Client {
         }
     }
 
-    private void mainLoop() {
+    private void mainLoop() throws Exception {
         while (true) {
             int choice;
 
@@ -241,39 +218,30 @@ public class Client {
             System.out.println("3. Удалить запись");
             System.out.println("4. Изменть запись");
             System.out.println("5. Получить запись");
+            System.out.println("6. Остановить");
 
             System.out.print(">: ");
             choice = sc.nextInt();
 
+            if (choice == 6) {
+                break;
+            }
+
             switch (choice) {
-                case 1:
-                    getFullDataBase();
-                    break;
-
-                case 2:
-                    addAuthorizeData();
-                    break;
-
-                case 3:
-                    delAuthorizeData();
-                    break;
-
-                case 4:
-                    updatePassword();
-                    break;
-
-                case 5:
-                    getAuthorizeData();
-                    break;
+                case 1 -> getFullDataBase();
+                case 2 -> addAuthorizeData();
+                case 3 -> delAuthorizeData();
+                case 4 -> updatePassword();
+                case 5 -> getAuthorizeData();
+                default -> throw new Exception("Некорректное число");
             }
         }
     }
 
+    /**
+     * Добавдение записи в базу данных с паролями пользователя
+     */
     private void addAuthorizeData() {
-        /*
-         * Добавдение записи в базу данных с паролями пользователя
-         * */
-
         String url;
         String login;
         String password;
@@ -312,11 +280,10 @@ public class Client {
         }
     }
 
+    /**
+     * Удаление записи из базы данных с паролями пользователя
+     */
     private void delAuthorizeData() {
-        /*
-         * Удаление записи из базы данных с паролями пользователя
-         * */
-
         String del_url;
 
         System.out.println("Введите url: ");
@@ -348,7 +315,7 @@ public class Client {
             e.printStackTrace();
         }
 
-        DataPackage dataBase = (DataPackage) recievePackage();
+        DataPackage dataBase = (DataPackage) receivePackage();
         ArrayList<String> urls = (ArrayList<String>) dataBase.getObject();
 
         System.out.println("\n\nВсе записи: ");
@@ -396,7 +363,7 @@ public class Client {
                     url,
                     PackageType.GET_AUTHORIZE_DATA));
 
-            DataPackage pack = (DataPackage) recievePackage();
+            DataPackage pack = (DataPackage) receivePackage();
 
             ArrayList<String> data = (ArrayList<String>) pack.getObject();
 

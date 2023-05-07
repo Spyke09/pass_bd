@@ -1,11 +1,12 @@
 import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+/**
+ * Простой класс для шифрования строковых переменных.
+ */
 public class AES {
     Cipher cipher;
     SecretKey key;
@@ -35,7 +36,6 @@ public class AES {
         cipher.init(Cipher.DECRYPT_MODE, key);
 
         byte[] dec = cipher.doFinal(encryptedBytes);
-        return dec.toString();
-//        return new String(cipher.doFinal(dec));
+        return new String(dec);
     }
 }

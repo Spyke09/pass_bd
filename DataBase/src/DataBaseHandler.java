@@ -1,12 +1,9 @@
-/*
- * Обработчик базы данных
- *
- * Добавляет или удаляет авторизационные данные из базы пользлвателей
- * */
-
 import java.sql.*;
-import java.util.Locale;
 
+/**
+ * Обработчик для главной базы данных с пользователями.
+ * Добавляет или удаляет авторизационные данные из базы пользователей.
+ */
 public class DataBaseHandler {
     private Connection co;
 
@@ -17,12 +14,14 @@ public class DataBaseHandler {
             Class.forName("org.sqlite.JDBC");
             co = DriverManager.getConnection("jdbc:sqlite:" + pathDbFile);
 
-            String request = " CREATE TABLE IF NOT EXISTS users (\n " +
-                    " login TEXT UNIQUE NOT NULL,\n" +
-                    " password TEXT NOT NULL,\n" +
-                    " phone_number TEXT,\n" +
-                    " email TEXT\n" +
-                    ");";
+            // Запрос, создающий таблицу users с полями [login, password, phone_number, email]
+            String request = """
+                     CREATE TABLE IF NOT EXISTS users (
+                      login TEXT UNIQUE NOT NULL,
+                     password TEXT NOT NULL,
+                     phone_number TEXT,
+                     email TEXT
+                    );""";
 
 
             Statement statement = co.createStatement();
@@ -33,6 +32,9 @@ public class DataBaseHandler {
         }
     }
 
+    /**
+     * Функция добавления строки в базу.
+     */
     public synchronized void addUser(String login,
                                      String password,
                                      String phoneNumber,
@@ -45,6 +47,9 @@ public class DataBaseHandler {
         statement.executeUpdate(response);
     }
 
+    /**
+     * Проверка юзера на существование по логину и паролю.
+     */
     public synchronized boolean checkUser(String login, String password) throws SQLException {
         String request = "SELECT login, password FROM users WHERE login = ?;')";
 
@@ -57,11 +62,7 @@ public class DataBaseHandler {
         String responce_password = result.getString("password");
 
         try {
-            if (responce_login.equals(login) && responce_password.equals(password)) {
-                return true;
-            } else {
-                return false;
-            }
+            return responce_login.equals(login) && responce_password.equals(password);
         } catch (NullPointerException e) {
             throw new NullPointerException();
         }
