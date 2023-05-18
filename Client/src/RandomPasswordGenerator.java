@@ -4,6 +4,8 @@ import java.util.Random;
  * Класс для генерации случайных паролей.
  */
 public class RandomPasswordGenerator {
+    private RandomPasswordGenerator() {}
+
     static private final String[] data = {"q", "w", "e", "r", "t", "y", "u", "i", "o", "p",
             "a", "s", "d", "f", "g", "h", "j", "k", "l",
             "z", "x", "c", "v", "b", "n", "m",
@@ -11,7 +13,7 @@ public class RandomPasswordGenerator {
     };
 
     static String genPass() {
-        int length = 15;
+        final int length = 15;
 
         String[] p = new String[length];
 

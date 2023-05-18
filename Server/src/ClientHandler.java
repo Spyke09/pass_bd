@@ -160,7 +160,7 @@ public class ClientHandler implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new Package(PackageType.EMPTY);
+        return new PackageAccept();
     }
 
 

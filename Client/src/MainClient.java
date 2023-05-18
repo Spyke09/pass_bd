@@ -1,5 +1,6 @@
 public class MainClient {
     public static void main(String[] args) throws Exception {
-        new Client().run();
+        Client client = new Client();
+        client.run();
     }
 }

@@ -81,11 +81,12 @@ public class Client {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new Package(PackageType.SERVICE_ERROR);
+        return new PackageError();
     }
 
     /**
      * Шифрует пакет и отправляет серверу.
+     * @param pac - пакет
      */
     private void sendPackage(Package pac) throws Exception {
         byte[] sendingPackage = enc.encrypt(pac, serverPublicKey);
@@ -239,7 +240,8 @@ public class Client {
     }
 
     /**
-     * Добавдение записи в базу данных с паролями пользователя
+     * Добавдение записи в базу данных с паролями пользователя.
+     * Если введенная строка-пароль == "_", то генерируется случайный.
      */
     private void addAuthorizeData() {
         String url;
@@ -347,10 +349,10 @@ public class Client {
             if (checkResponse()) {
                 System.out.println("Сделано!");
             } else {
-                System.err.println("Что-то пошшло не так");
+                System.err.println("Что-то пошло не так");
             }
         } catch (Exception e) {
-            System.err.println("Что-то пошшло не так");
+            System.err.println("Что-то пошло не так");
         }
     }
 

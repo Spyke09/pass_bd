@@ -17,6 +17,5 @@ public enum PackageType {
     GET_AUTHORIZE_DATA,
     SERVICE_ERROR,
     SERVICE_ACCEPT,
-    EMPTY,
     GET_FULL_DATA_BASE
 }

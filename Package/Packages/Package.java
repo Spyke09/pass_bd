@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * Сетевой пакет, который содержит всю необходимю информацию для передачи по сети.
  */
-public class Package implements Serializable {
+abstract public class Package implements Serializable {
     protected PackageType type;
     protected String sendingTime;
 
