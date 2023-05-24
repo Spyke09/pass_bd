@@ -1,7 +1,10 @@
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.nio.file.Files;
 
 /**
  * Обработчик баз данных, отвечающих за хранения паролей пользователей на разных сайтах.
@@ -9,8 +12,14 @@ import java.util.Date;
 public class PasswordDBHandler {
     private Connection connection;
 
-    PasswordDBHandler(String login) {
-        String path = "DataBase/users_db/" + login + ".db";
+    PasswordDBHandler(String login) throws IOException {
+        String dir = "DataBase/users_db/";
+        String path = dir + login + ".db";
+
+        if (!Files.exists(Paths.get(dir)))
+        {
+            Files.createDirectory(Paths.get(dir));
+        }
 
         try {
             Class.forName("org.sqlite.JDBC");

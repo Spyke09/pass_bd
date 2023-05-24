@@ -46,7 +46,11 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         exchangeKeys();
-        controller();
+        try {
+            controller();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -70,7 +74,7 @@ public class ClientHandler implements Runnable {
     /**
      * Обрабатывает принимаемые пакеты
      */
-    private void controller() {
+    private void controller() throws IOException {
         boolean stop_q = false;
         while (!stop_q) {
             Package pack = receivePackage();
@@ -231,7 +235,7 @@ public class ClientHandler implements Runnable {
     /**
      * Добавление записи в базу данных с паролями пользователя
      */
-    private void addAuthorizationData(String url, String login, String password) {
+    private void addAuthorizationData(String url, String login, String password) throws IOException {
         PasswordDBHandler dbHand = new PasswordDBHandler(this.login);
 
         try {
@@ -252,7 +256,7 @@ public class ClientHandler implements Runnable {
     /**
      * Удаление записи из базы данных с паролями пользователя
      */
-    private void delAuthorizeData(String url) {
+    private void delAuthorizeData(String url) throws IOException {
         PasswordDBHandler dbHand = new PasswordDBHandler(this.login);
 
         try {
@@ -269,7 +273,7 @@ public class ClientHandler implements Runnable {
      * Обновить пароль по url на новый password
      * @param password - новый пароль
      */
-    private void updatePassword(String url, String password) {
+    private void updatePassword(String url, String password) throws IOException {
         PasswordDBHandler dbHand = new PasswordDBHandler(this.login);
 
         try {
@@ -284,7 +288,7 @@ public class ClientHandler implements Runnable {
     /**
      * Послать данные авторизации.
      */
-    private void sendAuthorizeData(String url) {
+    private void sendAuthorizeData(String url) throws IOException {
         PasswordDBHandler dbHand = new PasswordDBHandler(this.login);
 
         try {
@@ -299,7 +303,7 @@ public class ClientHandler implements Runnable {
     /**
      * Отправляет всю базу данных пользователю
      */
-    private void sendAllDataBase() {
+    private void sendAllDataBase() throws IOException {
         PasswordDBHandler dbHand = new PasswordDBHandler(this.login);
 
         try {
