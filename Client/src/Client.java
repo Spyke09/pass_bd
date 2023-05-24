@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Client {
-    private final int PORT = 9999;
 
     Encryption enc;
 
@@ -17,7 +16,6 @@ public class Client {
     private final PublicKey selfPublicKey;
     private final PrivateKey selfPrivateKey;
 
-    private Socket socket;
     private ObjectOutputStream writer;
     private ObjectInputStream reader;
 
@@ -31,9 +29,9 @@ public class Client {
         this.selfPrivateKey = enc.getPrivateKey();
 
         try {
-            this.socket = new Socket(
+            Socket socket = new Socket(
                     "localhost",
-                    PORT
+                    9999
             );
 
             this.reader = new ObjectInputStream(socket.getInputStream());
@@ -240,7 +238,7 @@ public class Client {
     }
 
     /**
-     * Добавдение записи в базу данных с паролями пользователя.
+     * Добавление записи в базу данных с паролями пользователя.
      * Если введенная строка-пароль == "_", то генерируется случайный.
      */
     private void addAuthorizeData() {
@@ -318,7 +316,7 @@ public class Client {
         }
 
         DataPackage dataBase = (DataPackage) receivePackage();
-        ArrayList<String> urls = (ArrayList<String>) dataBase.getObject();
+        ArrayList<String> urls = dataBase.getObject();
 
         System.out.println("\n\nAll entries: ");
         for (String url : urls) {
@@ -367,7 +365,7 @@ public class Client {
 
             DataPackage pack = (DataPackage) receivePackage();
 
-            ArrayList<String> data = (ArrayList<String>) pack.getObject();
+            ArrayList<String> data = pack.getObject();
 
             for (String s : data) {
                 System.out.println(s);

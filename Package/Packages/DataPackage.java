@@ -1,11 +1,12 @@
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class DataPackage extends Package implements Serializable {
     private String url;
     private String login;
     private String password;
 
-    private Object object;
+    private ArrayList<String> object;
 
     DataPackage(String url, String login, String password, PackageType type) {
         super(type);
@@ -33,7 +34,7 @@ public class DataPackage extends Package implements Serializable {
 
     }
 
-    DataPackage(Object object, PackageType type) {
+    DataPackage(ArrayList<String> object, PackageType type) {
         super(type);
 
         this.object = object;
@@ -55,7 +56,7 @@ public class DataPackage extends Package implements Serializable {
         return password;
     }
 
-    public Object getObject() {
+    public ArrayList<String> getObject() {
         return object;
     }
 
