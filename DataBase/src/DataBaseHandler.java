@@ -33,7 +33,7 @@ public class DataBaseHandler {
     }
 
     /**
-     * Функция добавления строки в базу.
+     * Функция добавления пользователя в базу.
      */
     public synchronized void addUser(String login,
                                      String password,

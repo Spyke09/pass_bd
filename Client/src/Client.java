@@ -318,11 +318,11 @@ public class Client {
         DataPackage dataBase = (DataPackage) receivePackage();
         ArrayList<String> urls = dataBase.getObject();
 
-        System.out.println("\n\nAll entries: ");
+        System.out.println("\nAll entries: ");
         for (String url : urls) {
             System.out.println(url);
         }
-        System.out.println("\n\n");
+        System.out.println();
     }
 
     private void updatePassword() {
