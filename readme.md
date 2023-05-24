@@ -1,18 +1,18 @@
-# Компиляция и запуск
+# РљРѕРјРїРёР»СЏС†РёСЏ Рё Р·Р°РїСѓСЃРє
 
-Чтоб не заморачиваться, компилировать можно при помощи IntellijIdea
+Р§С‚РѕР± РЅРµ Р·Р°РјРѕСЂР°С‡РёРІР°С‚СЊСЃСЏ, РєРѕРјРїРёР»РёСЂРѕРІР°С‚СЊ РјРѕР¶РЅРѕ РїСЂРё РїРѕРјРѕС‰Рё IntellijIdea
 
 * ```Ctrl+Shift+F9```
 
-* или ![](https://resources.jetbrains.com/help/img/idea/2023.1/app.toolwindows.toolWindowBuild_dark.svg)
- сверху справа
+* РёР»Рё ![](https://resources.jetbrains.com/help/img/idea/2023.1/app.toolwindows.toolWindowBuild_dark.svg)
+ СЃРІРµСЂС…Сѓ СЃРїСЂР°РІР°
 
-Сервер и клиент нужно запускать в разных терминалах.
+РЎРµСЂРІРµСЂ Рё РєР»РёРµРЅС‚ РЅСѓР¶РЅРѕ Р·Р°РїСѓСЃРєР°С‚СЊ РІ СЂР°Р·РЅС‹С… С‚РµСЂРјРёРЅР°Р»Р°С….
 
-Команда для запуска сервера
+РљРѕРјР°РЅРґР° РґР»СЏ Р·Р°РїСѓСЃРєР° СЃРµСЂРІРµСЂР°
 
 ```java-path -classpath "out\production\Server;out\production\Package;out\production\DataBase;DataBase\src\sqlite-jdbc-3.41.0.0.jar" MainServer```
 
-Команда для запуска клиента.
+РљРѕРјР°РЅРґР° РґР»СЏ Р·Р°РїСѓСЃРєР° РєР»РёРµРЅС‚Р°.
 
 ```java-path -classpath "out\production\Client;out\production\Package" MainClient```
