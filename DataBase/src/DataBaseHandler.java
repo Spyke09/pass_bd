@@ -58,11 +58,11 @@ public class DataBaseHandler {
 
         ResultSet result = ps.executeQuery();
 
-        String responce_login = result.getString("login");
-        String responce_password = result.getString("password");
+        String response_login = result.getString("login");
+        String response_password = result.getString("password");
 
         try {
-            return responce_login.equals(login) && responce_password.equals(password);
+            return response_login.equals(login) && response_password.equals(password);
         } catch (NullPointerException e) {
             throw new NullPointerException();
         }

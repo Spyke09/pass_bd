@@ -91,32 +91,32 @@ public class ClientHandler implements Runnable {
 
                 case ADD_AUTHORIZE_DATA:
                     if (isAuthorized) {
-                        DataPackage aadp = (DataPackage) pack;
-                        System.out.println(aadp);
+                        DataPackage dp = (DataPackage) pack;
+                        System.out.println(dp);
 
                         addAuthorizationData(
-                                aadp.getUrl(),
-                                aadp.getLogin(),
-                                aadp.getPassword()
+                                dp.getUrl(),
+                                dp.getLogin(),
+                                dp.getPassword()
                         );
                     }
                     break;
 
                 case DELETE_AUTHORIZE_DATA:
                     if (isAuthorized) {
-                        DataPackage dadp = (DataPackage) pack;
-                        System.out.println(dadp);
+                        DataPackage dp = (DataPackage) pack;
+                        System.out.println(dp);
 
-                        delAuthorizeData(dadp.getUrl());
+                        delAuthorizeData(dp.getUrl());
                     }
                     break;
 
                 case MODIFY_AUTHORIZE_DATA:
                     if (isAuthorized) {
-                        DataPackage dadp = (DataPackage) pack;
-                        System.out.println(dadp);
+                        DataPackage dp = (DataPackage) pack;
+                        System.out.println(dp);
 
-                        updatePassword(dadp.getUrl(), dadp.getPassword());
+                        updatePassword(dp.getUrl(), dp.getPassword());
                     }
                     break;
 
@@ -165,7 +165,7 @@ public class ClientHandler implements Runnable {
 
 
     /**
-     * Шифрует пакет и потправляет пользователю
+     * Шифрует пакет и отправляет пользователю
      */
     private void sendPackage(Package pac) {
         try {

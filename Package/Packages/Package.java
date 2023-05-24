@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Сетевой пакет, который содержит всю необходимю информацию для передачи по сети.
+ * Сетевой пакет, который содержит всю необходимую информацию для передачи по сети.
  */
 abstract public class Package implements Serializable {
     protected PackageType type;

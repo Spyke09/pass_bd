@@ -42,11 +42,11 @@ public class PasswordDBHandler {
         java.util.Date date = new Date(System.currentTimeMillis());
         String format_date = formatter.format(date); // Уже отформатированное время и дата
 
-        String responce = "INSERT INTO data (url, login, password, last_update_time) " +
+        String response = "INSERT INTO data (url, login, password, last_update_time) " +
                 "VALUES ('" + url + "', '" + login + "', '" + password + "', '" + format_date + "')";
 
         Statement statement = connection.createStatement();
-        statement.executeUpdate(responce);
+        statement.executeUpdate(response);
     }
 
     /**

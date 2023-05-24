@@ -5,8 +5,6 @@ public class Test {
         try {
             AES aes = new AES();
 
-
-//            String enc_s = aes.encrypt(s);
             String enc_s = aes.encrypt(s);
             System.out.println(enc_s);
 
