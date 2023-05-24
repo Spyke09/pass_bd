@@ -40,7 +40,7 @@ public class Client {
             this.writer = new ObjectOutputStream(socket.getOutputStream());
 
         } catch (UnknownHostException e) {
-            System.err.println("Сервер недоступен.");
+            System.err.println("The server is unavailable.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,7 +55,7 @@ public class Client {
         try {
             exchangeKeys();
         } catch (Exception e) {
-            System.err.println("Не удается обменяться открытыми ключами.");
+            System.err.println("Public keys cannot be exchanged.");
             e.printStackTrace();
         }
         // Авторизация на сервере
@@ -113,9 +113,9 @@ public class Client {
     private void authorize() throws Exception {
         int choice;
 
-        System.out.println("ВЫберите действие: ");
-        System.out.println("1. Авторизация");
-        System.out.println("2. Регистрация");
+        System.out.println("Select an action:");
+        System.out.println("1. Authorization");
+        System.out.println("2. Registration");
 
         System.out.print("\n>: ");
         choice = sc.nextInt();
@@ -129,13 +129,13 @@ public class Client {
                 try {
                     registration();
                 } catch (Exception e) {
-                    System.out.println("При регистрации произошла ошибка!");
+                    System.out.println("An error occurred during registration!");
                     e.printStackTrace();
                 }
                 break;
 
             default:
-                System.out.println("Нет такого действия");
+                System.out.println("There is no such action.");
         }
     }
 
@@ -149,16 +149,16 @@ public class Client {
         String phoneNumber;
         String email;
 
-        System.out.print("Введите логин: ");
+        System.out.print("Enter your login: ");
         login = sc.next();
 
-        System.out.print("Введите пароль: ");
+        System.out.print("Enter the password: ");
         password = sc.next();
 
-        System.out.print("Введите номер телефона: ");
+        System.out.print("Enter your phone number: ");
         phoneNumber = sc.next();
 
-        System.out.print("Введите электронную почту: ");
+        System.out.print("Enter your email address: ");
         email = sc.next();
 
         RegistrationPackage rgp = new RegistrationPackage(
@@ -171,10 +171,10 @@ public class Client {
         sendPackage(rgp);
 
         if (checkResponse()) {
-            System.out.println("Регистрация прошла успешно!");
+            System.out.println("Registration was successful!");
             mainLoop();
         } else {
-            System.err.println("Ошибка при регистрации");
+            System.err.println("Error during registration.");
         }
     }
 
@@ -186,10 +186,10 @@ public class Client {
         String login;
         String password;
 
-        System.out.print("Введите логин: ");
+        System.out.print("Enter your username: ");
         login = sc.next();
 
-        System.out.print("Введите пароль: ");
+        System.out.print("Enter the password: ");
         password = sc.next();
 
         AuthorizationPackage pack = new AuthorizationPackage(login, password);
@@ -201,10 +201,10 @@ public class Client {
         }
 
         if (checkResponse()) {
-            System.out.println("Все крута. Добро пожаловать!");
+            System.out.println("Welcome!");
             mainLoop();
         } else {
-            System.err.println("Что-то пошло не так");
+            System.err.println("Something went wrong.");
             System.exit(1);
         }
     }
@@ -213,13 +213,13 @@ public class Client {
         while (true) {
             int choice;
 
-            System.out.println("\nЧто сделать: ");
-            System.out.println("1. Получить всю базу данных");
-            System.out.println("2. Добавить запись");
-            System.out.println("3. Удалить запись");
-            System.out.println("4. Изменть запись");
-            System.out.println("5. Получить запись");
-            System.out.println("6. Остановить");
+            System.out.println("\nAction:");
+            System.out.println("1. Get the all database");
+            System.out.println("2. Add an entry");
+            System.out.println("3. Delete an entry");
+            System.out.println("4. Edit entry");
+            System.out.println("5. Get entry");
+            System.out.println("6. Stop");
 
             System.out.print(">: ");
             choice = sc.nextInt();
@@ -234,7 +234,7 @@ public class Client {
                 case 3 -> delAuthorizeData();
                 case 4 -> updatePassword();
                 case 5 -> getAuthorizeData();
-                default -> throw new Exception("Некорректное число");
+                default -> throw new Exception("Invalid number");
             }
         }
     }
@@ -248,13 +248,13 @@ public class Client {
         String login;
         String password;
 
-        System.out.println("Введите url: ");
+        System.out.println("Enter url: ");
         url = sc.next();
 
-        System.out.println("Введите логин: ");
+        System.out.println("Enter login: ");
         login = sc.next();
 
-        System.out.println("Введите пароль: ");
+        System.out.println("Enter password: ");
         password = sc.next();
 
         if (password.equals("_")) {
@@ -272,9 +272,9 @@ public class Client {
             sendPackage(pack);
 
             if (checkResponse()) {
-                System.out.println("Добавлено!");
+                System.out.println("Added!");
             } else {
-                System.err.println("Какая-то ошибка");
+                System.err.println("Some mistake.");
             }
 
         } catch (Exception e) {
@@ -288,7 +288,7 @@ public class Client {
     private void delAuthorizeData() {
         String del_url;
 
-        System.out.println("Введите url: ");
+        System.out.println("Enter url: ");
         del_url = sc.next();
 
         DataPackage pack = new DataPackage(del_url, PackageType.DELETE_AUTHORIZE_DATA);
@@ -297,12 +297,12 @@ public class Client {
             sendPackage(pack);
 
             if (checkResponse()) {
-                System.out.println("Сделано!");
+                System.out.println("Done!");
             } else {
-                System.err.println("Что-то пошло не так");
+                System.err.println("Some mistake.");
             }
         } catch (Exception e) {
-            System.err.println("Что-то пошло не так");
+            System.err.println("Some mistake.");
         }
     }
 
@@ -313,14 +313,14 @@ public class Client {
             sendPackage(pack);
             Thread.sleep(1500);
         } catch (Exception e) {
-            System.err.println("Что-то пошло не так");
+            System.err.println("Some mistake.");
             e.printStackTrace();
         }
 
         DataPackage dataBase = (DataPackage) receivePackage();
         ArrayList<String> urls = (ArrayList<String>) dataBase.getObject();
 
-        System.out.println("\n\nВсе записи: ");
+        System.out.println("\n\nAll entries: ");
         for (String url : urls) {
             System.out.println(url);
         }
@@ -331,10 +331,10 @@ public class Client {
         String url;
         String password;
 
-        System.out.println("Введите url");
+        System.out.println("Enter url");
         url = sc.next();
 
-        System.out.println("Введите пароль");
+        System.out.println("Enter password");
         password = sc.next();
 
         if (password.equals("_")) {
@@ -347,17 +347,17 @@ public class Client {
             sendPackage(pack);
 
             if (checkResponse()) {
-                System.out.println("Сделано!");
+                System.out.println("Done!");
             } else {
-                System.err.println("Что-то пошло не так");
+                System.err.println("Some mistake.");
             }
         } catch (Exception e) {
-            System.err.println("Что-то пошло не так");
+            System.err.println("Some mistake.");
         }
     }
 
     private void getAuthorizeData() {
-        System.out.print("Введите url: ");
+        System.out.print("Enter url: ");
         String url = sc.next();
 
         try {
@@ -374,7 +374,7 @@ public class Client {
             }
 
         } catch (Exception e) {
-            System.err.println("Что-то пошло не так");
+            System.err.println("Some mistake.");
         }
     }
 }

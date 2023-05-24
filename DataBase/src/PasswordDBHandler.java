@@ -107,7 +107,7 @@ public class PasswordDBHandler {
         while (result.next()) {
             String url_ = result.getString(1);
             String last_update_ = result.getString(4);
-            urls.add(url_ + "\t(Последнее обновление: " + last_update_ + ")");
+            urls.add(url_ + "\t(Last update: " + last_update_ + ")");
         }
 
         return urls;
